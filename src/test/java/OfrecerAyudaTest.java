@@ -1,0 +1,126 @@
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import junit.framework.Assert;
+
+/****************************************/
+// Historia de Usuario:
+//
+// Como usuario ofrecer ayuda a la solicitud
+// de una publicaión
+//
+// Prueba de Aceptación:
+//
+// Verificar que se pueda ofrecer ayuda a una solicitud de una publicación
+//
+// CASO BASE: Ofrecer ayuda con una tarea #47
+//
+// PASOS:
+//
+// 1. Iniciar sesión
+// 2. Ir al Feed
+// 3. Seleccionar la opción "ver más" de una publicación
+// 4. Seleccionar la opción "ofrecer ayuda"
+//
+// Resultado Esperado:
+//
+// Se muestra la información de la publicación seleccionada
+/****************************************/
+
+public class OfrecerAyudaTest extends BaseTest {
+
+    @Test
+    public void verificarInformacionAnuncios() {
+
+        /********** Preparación **********/
+        // Se navega a la página de login del sitio web
+        // Se espera 3 segundos para que cargue el formulario
+
+        driver.get("http://localhost:8090/login");
+
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        /********** Login **********/
+        // PASO 1: Se localiza el campo de correo por su ID "email"
+        // Se ingresa un correo institucional válido y registrado
+
+        driver.findElement(By.id("email"))
+                .sendKeys("a@test5.edu");
+
+        // PASO 2: Se localiza el campo de contraseña por su ID "password"
+        // Se ingresa la contraseña correcta asociada al correo
+
+        driver.findElement(By.id("password"))
+                .sendKeys("12345678Ab");
+
+        // PASO 3: Se localiza el botón de submit mediante XPath
+        // Se hace clic para enviar el formulario de login
+
+        driver.findElement(By.xpath("//button[@type='submit']"))
+                .click();
+
+        // Se espera 4 segundos para que el sistema procese el login
+        // y redirija al feed (panel de exploración)
+
+        try {
+            TimeUnit.SECONDS.sleep(4);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        /********** Buscar **********/
+        // PASO 4: Se localiza el boton ver mas de una publiacion mediante XPath
+        // El campo contiene el placeholder "Ver mas"
+        // Se selecciona la opción "Ver mas"
+
+        WebElement vermas =
+                driver.findElement(
+                        By.xpath("//*[@id=\"root\"]/div[2]/div/div[3]/div/div/div[3]/div/a/button")
+                );
+
+        vermas.click();
+
+        // Se espera 8 segundos para que el filtro se aplique en tiempo real
+        // y la lista de anuncios se actualice mostrando solo los que coinciden
+
+        try {
+            TimeUnit.SECONDS.sleep(8);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // PASO 5: Se localiza el anuncio específico que debería aparecer
+        // Se mesutra la información de la publicación seleccionada
+        //Se selecciona el botón para ofrecer ayuda
+
+        WebElement ofrecerayuda =
+                driver.findElement(
+                        By.xpath("//*[@id=\"root\"]/div[2]/div/div[2]/div/div/button")
+                );
+        ofrecerayuda.click();
+        /********** Verificación **********/
+        // PASO 6: Se verifica que el texto del botón haya cambiado 
+
+        WebElement verificarayuda =
+                driver.findElement(
+                        By.xpath("//*[@id=\"root\"]/div[2]/div/div[2]/div/div")
+                );
+        boolean AyudaEnviada = verificarayuda.getText().contains("Ya te has ofrecido para ayudar");
+        Assert.assertEquals(true, AyudaEnviada);
+        
+        // Se imprime en consola la confirmación de que se encontró el anuncio filtrado
+
+        System.out.println(
+                "Se envió ayuda: "
+                        + AyudaEnviada
+        );
+    }
+}
